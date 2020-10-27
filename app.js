@@ -6,7 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const db = require('./db/index')
+const productRouter = require('./routes/products.js')
 
 var app = express();
 
@@ -22,6 +22,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/products', productRouter);
+
+const { DataTypes } = require('sequelize');
+const sequelize = require('./storage')
+const product = require('./products.js')
+
+const order = sequelize.define('order', {
+  createdBy: {type: DataTypes.BOOLEAN},
+  isPending: {type: DataTypes.BOOLEAN}
+})
+
+const orderItem = sequelize.define('orderItem', {
+  orderRef: {type: DataTypes.BOOLEAN}
+})
+
+const syncTables =async ()=>{
+  // await User.sync()
+  await product.sync()
+  await order.sync()
+  await orderItem.sync()
+  console.log('db synced')
+}
+
+syncTables()
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
